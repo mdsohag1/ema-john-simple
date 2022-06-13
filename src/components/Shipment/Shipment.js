@@ -1,14 +1,33 @@
 import React, { useContext } from 'react';
 import {useForm} from 'react-hook-form'
+import { clearTheCart, getStoredCart } from '../../utilities/fakedb';
 import { UserContext } from './../../App';
 import './Shipment.css';
 
 const Shipment = () => {
     const { register, handleSubmit, watch, formState: { errors } } = useForm();
     const [loggedInUser, setLoggedInUser] = useContext(UserContext);
-    const onSubmit = data => console.log(data);
+
+    const onSubmit = data => {
+      const saveCart = getStoredCart();
+      const orderDatails = {...loggedInUser, products: saveCart, shipment: data, orderTime: new Date()}
+
+      fetch('https://immense-brook-50882.herokuapp.com/addOrder', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(orderDatails)
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data){
+          clearTheCart();
+          alert('your order successfully')
+        }
+      })
+
+    };
   
-    console.log(watch("example")); // watch input value by passing the name of it
+    // console.log(watch("example")); // watch input value by passing the name of it
   
     return (
       <form className='ship-form' onSubmit={handleSubmit(onSubmit)}>

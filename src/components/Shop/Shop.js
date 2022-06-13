@@ -1,25 +1,31 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import fakeData from '../../fakeData'
 import { addToDb, getStoredCart } from '../../utilities/fakedb';
 import Cart from '../Cart/Cart';
 import Product from '../Product/Product';
 import './Shop.css';
 
 const Shop = () => {
-    const first10 = fakeData.slice(0,10)
-    const [products, setproducts] = useState(first10);
+    // const first10 = fakeData.slice(0,10)
+    const [products, setproducts] = useState([]);
     const [cart, setCart] = useState([]);
 
-    useEffect(() =>{
+    useEffect(() => {
+        fetch('https://immense-brook-50882.herokuapp.com/products')
+            .then(res => res.json())
+            .then(data => setproducts(data))
+    }, [])
+
+    useEffect(() => {
         const saveCart = getStoredCart();
         const productKeys = Object.keys(saveCart)
-        const previesCart = productKeys.map(exitingKey => {
-            const product = fakeData.find(pd => pd.key === exitingKey);
-            product.quantity = saveCart[exitingKey];
-            return product;
+        fetch('https://immense-brook-50882.herokuapp.com/productByKeys', {
+            method: 'POST',
+            headers: { 'Content-type':'application/json' },
+            body: JSON.stringify(productKeys)
         })
-        setCart(previesCart);
+        .then(res => res.json())
+        .then(data => setCart(data))
     }, [])
 
     const handleAddProduct = (product) => {
@@ -27,13 +33,13 @@ const Shop = () => {
         const sameProduct = cart.find(pd => pd.key === tobeAdded);
         let count = 1;
         let newCart;
-        if(sameProduct) {
+        if (sameProduct) {
             count = sameProduct.quantity + 1;
             sameProduct.quantity = count;
             const others = cart.filter(pd => pd.key !== tobeAdded);
             newCart = [...others, sameProduct];
         }
-        else{
+        else {
             product.quantity = 1;
             newCart = [...cart, product];
         }

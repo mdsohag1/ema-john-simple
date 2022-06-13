@@ -11,7 +11,6 @@ const Review = () => {
     const [cart, setCart] = useState([]);
     const [orderPlace, setOrderPlace] = useState(false); 
     const navigate = useNavigate();
-    // const history = createBrowserHistory();
 
     const handleRemove = (key) => {
         const newCart = cart.filter(pd => pd.key !== key);
@@ -20,17 +19,19 @@ const Review = () => {
     }
     const handleProceedOrder = () => {
         navigate('/shipment')
-        // history.push('/shipment')
     }
     useEffect(()=>{
         const savedCart = getStoredCart();
         const productKeys = Object.keys(savedCart)
-        const cartProduct = productKeys.map(key => {
-            const product = fakeData.find(pd => pd.key === key);
-            product.quantity = savedCart[key];
-            return product;
+
+        fetch('https://immense-brook-50882.herokuapp.com/productByKeys', {
+            method: 'POST',
+            headers: { 'Content-type':'application/json' },
+            body: JSON.stringify(productKeys)
         })
-        setCart(cartProduct);
+        .then(res => res.json())
+        .then(data => setCart(data))
+
     }, []);
 
     let thankyou;

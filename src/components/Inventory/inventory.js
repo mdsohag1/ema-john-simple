@@ -1,9 +1,23 @@
 import React from 'react';
 
 const Inventory = () => {
+    const product = {};
+    const handleAddProduct = () => {
+        fetch('https://immense-brook-50882.herokuapp.com/addProduct', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json'},
+            body: JSON.stringify(product)
+        })
+    }
     return (
-        <div>
-            <h1>this is inventory</h1>
+        <div style={{textAlign: "center"}}>
+            <form action="">
+                <p><span>Name: </span><input type="text" /></p>
+                <p><span>Price: </span><input type="text" /></p>
+                <p><span>Quantity: </span><input type="text" /></p>
+                <p><span>Photo: </span><input type="file" /></p>
+                <button onClick={handleAddProduct}>Add Product</button>
+            </form>
         </div>
     );
 };
